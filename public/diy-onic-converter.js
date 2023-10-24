@@ -93,10 +93,10 @@ const wrapHighlightedSegment = (segment) => {
 };
 
 // For ease of development, automatically run this on page load
-window.addEventListener('load', () => {
-  // diyOnicConverter('.test-content');
-  diyOnicConverter('body');
-});
+// window.addEventListener('load', () => {
+//   // diyOnicConverter('.test-content');
+//   diyOnicConverter('body');
+// });
 
 // Allow global access so that this can be executed from the console.
 window.diyOnicConverter = diyOnicConverter;
