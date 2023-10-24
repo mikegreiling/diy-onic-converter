@@ -1,25 +1,31 @@
 /**
  * Implement your converter function here.
  */
-const diyOnicConverter = (textContentContainerSelector) => {
+const diyOnicConverter = (
+  textContentContainerSelector,
+  charsToHighlight = 3
+) => {
   const container = document.querySelector(textContentContainerSelector);
   console.log('Performing bionic reading conversion on:', container);
 
   // Get all <p> tags in the container and process them.
-  const paragraphs = container.querySelectorAll('p');
+  // const paragraphs = container.querySelectorAll('p');
 
   // Naive implementation
   // paragraphs.forEach((paragraph) => naiveProcessNode(paragraph));
 
   // HTML-aware implementation
   const replacementQueue = [];
-  paragraphs.forEach((paragraph) => processNode(paragraph, replacementQueue));
+  // paragraphs.forEach((paragraph) => processNode(paragraph, replacementQueue));
+
+  // Apply the conversion to the entire container, not just `p` tags
+  processNode(container, replacementQueue, charsToHighlight);
 
   // This is convoluted, but I found that if I replaced the text
   // nodes as I encountered them within processNode, the iterator
-  // would break. So instead, I collect all the text nodes that need
-  // to be replaced and perform the replacement action after parsing
-  // the entire tree.
+  // would break. So instead, I process all of the nodes, and queue
+  // each of the replacement actions as an array of tuples containing
+  // a node and the arguments to be provided to `replaceWith`.
   replacementQueue.forEach(([node, replacement]) =>
     node.replaceWith(...replacement)
   );
@@ -38,9 +44,9 @@ const naiveProcessNode = (node) => {
  * Takes a string and returns HTML string which highlights the first
  * three characters
  */
-const naiveProcessWord = (word, highlightChars = 3) => {
-  const toHighlight = word.slice(0, highlightChars);
-  const theRest = word.slice(highlightChars);
+const naiveProcessWord = (word, charsToHighlight = 3) => {
+  const toHighlight = word.slice(0, charsToHighlight);
+  const theRest = word.slice(charsToHighlight);
   return `<span class='bonic-word' style='font-weight: bold;'>${toHighlight}</span>${theRest}`;
 };
 
@@ -48,11 +54,13 @@ const naiveProcessWord = (word, highlightChars = 3) => {
  * More sophisticated implementation. Attempts to preserve HTML tags
  * and surrounding whitespace
  */
-const processNode = (node, replacementQueue) => {
+const processNode = (node, replacementQueue, charsToHighlight = 3) => {
   if (node.nodeType === Node.TEXT_NODE) {
-    replacementQueue.push([node, processTextNode(node)]);
+    replacementQueue.push([node, processTextNode(node, charsToHighlight)]);
   } else if (node.childNodes.length > 0) {
-    node.childNodes.forEach((child) => processNode(child, replacementQueue));
+    node.childNodes.forEach((child) =>
+      processNode(child, replacementQueue, charsToHighlight)
+    );
   }
 };
 
@@ -64,7 +72,7 @@ const processNode = (node, replacementQueue) => {
  * Returns an array of DOM nodes or strings that will replace the
  * content.
  */
-const processTextNode = (node, highlightChars = 3) => {
+const processTextNode = (node, charsToHighlight = 3) => {
   const wordSegments = node.textContent.split(/(\w+)/);
 
   return wordSegments.reduce((processed, segment) => {
@@ -72,8 +80,8 @@ const processTextNode = (node, highlightChars = 3) => {
     if (!segment.match(/\w+/)) {
       processed.push(segment);
     } else {
-      const toHighlight = segment.slice(0, highlightChars);
-      const theRest = segment.slice(highlightChars);
+      const toHighlight = segment.slice(0, charsToHighlight);
+      const theRest = segment.slice(charsToHighlight);
       processed.push(wrapHighlightedSegment(toHighlight), theRest);
     }
     return processed;

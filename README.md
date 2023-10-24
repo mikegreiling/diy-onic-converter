@@ -15,7 +15,28 @@ Coding challenge to make your own (DIY) “bionic reading converter.”
     up all of the `replaceWith` actions and performing the replacement
     at the end, I was able to achieve what I needed, but I _normally_
     do not like mutating function props, and the code structure is
-    less than ideal.
+    less than ideal. Given more time I would refactor this to have
+    processNode return a queue of actions, rather than mutating the
+    provided array.
+- I am splitting words based on simple regex of `\w+`. I initially
+  split on whitespace, but found that this was capturing and
+  highlighting a lot of punctuation and symbols `(`, `°`, etc. I see
+  in the example output for the exercise that this is expected, but I
+  but I made a delibarate choice to omit these. As a result,
+  hyphenated words (like "gold-plated") have the first three letters
+  emboldened on each segment as well.
+- As per the suggested "above and beyond" scope suggestions:
+  - I have altered the default behavior to apply this transformation
+    to all of the children of the provided container, not just `<p>`
+    tags.
+  - I have added a `charsToHighlight` parameter to alter the number
+    of characters to make bold in each word (default is 3).
+  - I have ensured that this can be run on arbitrary webpages and
+    included instructions below.
+  - I have ensured that HTML will be preserved (with the
+    above-mentioned caveats).
+  - I have described the limitations of this implementation and how
+    I might go about improving things if I had more time.
 
 ## Limitations:
 
